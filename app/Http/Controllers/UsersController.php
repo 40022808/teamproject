@@ -28,28 +28,51 @@ class UsersController extends Controller
             $user->save();
         }
 
-        return response()->json(['message' => 'User registered successfully.'], 201);
+
+        if($lang == 'en') {
+            return response()->json(['message' => 'User registered successfully.'], 201);
+        }else if ($lang == 'hu') {
+            return response()->json(['message' => 'A felhaszmáló sikeresen regisztrálva.'], 201);
+        }else if ($lang == 'zh') {
+            return response()->json(['message' => '用户注册成功'],201);
+        }
+        
     }
 
     public function login(Request $request, $lang)
     {
-        $credentials = $request->only('name','email', 'password');
+        $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             $token = Auth::user()->createToken('authToken')->plainTextToken;
             return response()->json(['token' => $token]);
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        
+        if($lang == 'en') {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }else if ($lang == 'hu') {
+            return response()->json(['error' => 'Nem engedélyezett'], 401);
+        }else if ($lang == 'zh') {
+            return response()->json(['error' => '登录失败'], 401);
+        }
     }
 
     public function logout($lang)
     {
         Auth::logout();
-        return response()->json(['message' => 'Logged out successfully.']);
+        
+
+        if($lang == 'en') {
+            return response()->json(['message' => 'Logged out successfully.']);
+        }else if ($lang == 'hu') {
+            return response()->json(['message' => 'Sikeresen kkijelentkezett.']);
+        }else if ($lang == 'zh') {
+            return response()->json(['message' => '登出成功.']);
+        }
     }
 
-    public function delete($id, $lang)
+    /* public function delete($id, $lang)
     {
         $user = User::find($id);
         if ($user) {
@@ -58,7 +81,7 @@ class UsersController extends Controller
         } else {
             return response()->json(['error' => 'User not found.'], 404);
         }
-    }
+    } */
 
     public function getUserInfo(Request $request)
     {
@@ -68,5 +91,42 @@ class UsersController extends Controller
             'userRole' => $user->role,
         ]);
     }
+
+    public function upgradeToAdmin(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $targetUser = User::find($id);
+        if (!$targetUser || $targetUser->isAdmin() || $targetUser->isSuperAdmin()) {
+            return response()->json(['error' => 'User cannot be upgraded to admin.'], 400);
+        }
+
+        $targetUser->role = 1;
+        $targetUser->save();
+
+        return response()->json(['message' => 'User upgraded to admin successfully.']);
+    }
+
+    public function downgradeFromAdmin(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (!$user->isSuperAdmin()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $targetUser = User::find($id);
+        if (!$targetUser || !$targetUser->isAdmin()) {
+            return response()->json(['error' => 'User cannot be downgraded from admin.'], 400);
+        }
+
+        $targetUser->role = 0;
+        $targetUser->save();
+
+        return response()->json(['message' => 'User downgraded from admin successfully.']);
+    }
+
 }
 
