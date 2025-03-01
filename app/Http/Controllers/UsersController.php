@@ -128,5 +128,67 @@ class UsersController extends Controller
         return response()->json(['message' => 'User downgraded from admin successfully.']);
     }
 
+
+    public function updateUserName(Request $request, $lang)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated.'], 401);
+        }
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:20',
+        ]);
+
+        $user->name = $validatedData['name'];
+        $user->save();
+
+        if($lang == 'en') {
+            return response()->json(['message' => 'User name updated successfully.']);
+        } else if ($lang == 'hu') {
+            return response()->json(['message' => 'A felhasználó neve sikeresen frissítve.']);
+        } else if ($lang == 'zh') {
+            return response()->json(['message' => '用户名更新成功'], 200);
+        }
+    }
+
+
+    public function checkOldPassword(Request $request) {
+        $user = Auth::user();
+        $validatedData = $request->validate([
+            'old_password' => 'required|string|min:6',
+        ]);
+        
+        if (password_verify($validatedData['old_password'], $user->password)) {
+            return response()->json(['message' => 'Old password is correct.']);
+        } else {
+            return response()->json(['error' => 'Old password is incorrect.'], 400);
+        }
+    }
+    
+    public function updatePassword(Request $request, $lang) {
+        $user = Auth::user();
+        $validatedData = $request->validate([
+            'new_password' => 'required|string|min:6|confirmed|max:10',
+            
+        ]);
+    
+        
+        $user->password = bcrypt($validatedData['new_password']);
+        $user->save();
+        
+        if ($lang == 'en') {
+            return response()->json(['message' => 'Password updated successfully.']);
+        } else if ($lang == 'hu') {
+            return response()->json(['message' => 'A jelszó sikeresen frissítve.']);
+        } else if ($lang == 'zh') {
+            return response()->json(['message' => '密码更新成功'], 200);
+        }
+    }
+    
+
+
+
 }
 
