@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\BookingController;
 
 Route::group(['prefix' => '{lang}'], function() {
     Route::post('register', [UsersController::class, 'register']);
@@ -26,3 +27,7 @@ Route::middleware('auth:sanctum')->put('users/{id}/upgrade', [UsersController::c
 Route::middleware('auth:sanctum')->put('users/{id}/downgrade', [UsersController::class, 'downgradeFromAdmin']);
 
 Route::middleware('auth:sanctum')->post('checkoldpassword', [UsersController::class, 'checkOldPassword']);
+
+Route::get('check-booking', [BookingController::class, 'checkBooking']);
+Route::post('check-booking/store', [BookingController::class, 'storeBooking']);
+Route::get('check-booking/booked-dates', [BookingController::class, 'getBookedDates']);
