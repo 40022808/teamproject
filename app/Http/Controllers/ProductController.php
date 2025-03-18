@@ -9,28 +9,13 @@ class ProductController extends Controller
 {
     public function store(Request $request)
     {
-        // Validate the request
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            "name" => "required|string|max:255",
+            "price" => "required|numeric",
+            "imageURL" => "nullable|string"
         ]);
-        // Create a new product instance
-        $product = new Product();
-        $product->name = $request->name;
-        $product->description = $request->description;
-        $product->price = $request->price;
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            $product->imageURL = '/storage/' . $imagePath;
-        }
-
-        // Save the product to the database
-        $product->save();
-
+        $product = Product::create($request->all());
         return response()->json($product, 201);
     }
 
