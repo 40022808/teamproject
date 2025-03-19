@@ -11,6 +11,7 @@ class CreateBookingsTable extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->date('date'); // A foglalás dátuma
+            $table->time('time'); // A foglalás időpontja
             $table->timestamps();
         });
     }

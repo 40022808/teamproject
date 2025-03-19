@@ -7,35 +7,36 @@ use App\Models\Booking;
 class BookingController extends Controller
 {
     public function checkBooking(Request $request)
-    {
-        $date = $request->query('date');
-        $booked = Booking::where('date', $date)->exists(); 
+{
+    $date = $request->query('date');
+    $time = $request->query('time');
 
-        return response()->json(['booked' => $booked]); 
-    }
+    $booked = Booking::where('date', $date)
+                     ->where('time', $time)
+                     ->exists(); // Ellenőrizzük, hogy a dátum és idő foglalt-e
 
-    public function storeBooking(Request $request)
-    {
-        
-        $date = $request->input('date');
+    return response()->json(['booked' => $booked]);
+}
 
-        if(!$date) {
-            return response()->json(['error'=> 'Date is required'], 400);
-        }
-        $dateTime = new \DateTime($date);
-        $date = $dateTime->format('Y-m-d');
+public function storeBooking(Request $request)
+{
+    $validated = $request->validate([
+        'date' => 'required|date',
+        'time' => 'required|date_format:H:i', // Idő validálása
+    ]);
 
-        $booking = new Booking();
-        $booking->date = $date;
-        $booking->save();
+    $booking = new Booking();
+    $booking->date = $validated['date'];
+    $booking->time = $validated['time'];
+    $booking->save();
 
-        return response()->json(['success' => true, 'date' => $date]);
-    }
+    return response()->json(['success' => true, 'date' => $booking->date, 'time' => $booking->time]);
+}
 
-    public function getBookedDates()
-    {
-        $dates = Booking::pluck('date'); // Lekérjük az összes foglalt dátumot
+public function getBookedDates()
+{
+    $bookings = Booking::select('date', 'time')->get(); // Dátum és idő lekérdezése
 
-        return response()->json(['dates' => $dates]); // Helyes változónév
-    }
+    return response()->json(['bookings' => $bookings]);
+}
 }
