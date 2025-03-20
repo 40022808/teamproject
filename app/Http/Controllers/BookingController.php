@@ -22,15 +22,17 @@ public function storeBooking(Request $request)
 {
     $validated = $request->validate([
         'date' => 'required|date',
-        'time' => 'required|date_format:H:i', // Idő validálása
+        'time' => 'required|date_format:H:i',
+        'gender' => 'required|string',
     ]);
 
     $booking = new Booking();
     $booking->date = $validated['date'];
     $booking->time = $validated['time'];
+    $booking->gender = $validated['gender'];
     $booking->save();
 
-    return response()->json(['success' => true, 'date' => $booking->date, 'time' => $booking->time]);
+    return response()->json(['success' => true, 'booking' => $booking]);
 }
 
 public function getBookedDates()
