@@ -13,6 +13,7 @@ Route::group(['prefix' => '{lang}'], function () {
     /* Route::delete('users/{id}', [UsersController::class, 'delete']); */
     Route::middleware('auth:sanctum')->post('update-username', [UsersController::class, 'updateUserName']);
     Route::middleware('auth:sanctum')->post('update-password', [UsersController::class, 'updatePassword']);
+    Route::middleware('auth:sanctum')->get('getUserList', [UsersController::class, 'getUserList']);
 });
 
 /* Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -21,9 +22,10 @@ Route::group(['prefix' => '{lang}'], function () {
 
 /* Route::post('{lang}/login', [UsersController::class, 'login']); */
 Route::middleware('auth:sanctum')->get('/user', [UsersController::class, 'getUserInfo']);
-Route::middleware('auth:sanctum')->put('users/{id}/upgrade', [UsersController::class, 'upgradeToAdmin']);
-Route::middleware('auth:sanctum')->put('users/{id}/downgrade', [UsersController::class, 'downgradeFromAdmin']);
+Route::middleware('auth:sanctum')->put('users/{email}/upgrade', [UsersController::class, 'upgradeToAdmin']);
+Route::middleware('auth:sanctum')->put('users/{email}/downgrade', [UsersController::class, 'downgradeFromAdmin']);
 Route::middleware('auth:sanctum')->post('checkoldpassword', [UsersController::class, 'checkOldPassword']);
+Route::middleware('auth:sanctum')->get('getUserByEmail/{email}', [UsersController::class, 'getUserByEmail']);
 
 
 

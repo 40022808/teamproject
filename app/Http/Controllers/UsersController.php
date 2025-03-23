@@ -92,14 +92,14 @@ class UsersController extends Controller
         ]);
     }
 
-    public function upgradeToAdmin(Request $request, $id)
+    public function upgradeToAdmin(Request $request, $email)
     {
         $user = Auth::user();
         if (!$user->isSuperAdmin()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $targetUser = User::find($id);
+        $targetUser = User::where('email', $email)->first();
         if (!$targetUser || $targetUser->isAdmin() || $targetUser->isSuperAdmin()) {
             return response()->json(['error' => 'User cannot be upgraded to admin.'], 400);
         }
@@ -110,14 +110,14 @@ class UsersController extends Controller
         return response()->json(['message' => 'User upgraded to admin successfully.']);
     }
 
-    public function downgradeFromAdmin(Request $request, $id)
+    public function downgradeFromAdmin(Request $request, $email)
     {
         $user = Auth::user();
         if (!$user->isSuperAdmin()) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $targetUser = User::find($id);
+        $targetUser = User::where('email', $email)->first();
         if (!$targetUser || !$targetUser->isAdmin()) {
             return response()->json(['error' => 'User cannot be downgraded from admin.'], 400);
         }
@@ -187,6 +187,32 @@ class UsersController extends Controller
         }
     }
     
+
+    public function getUserList($lang)
+    {
+        $users = User::all(); 
+
+        if ($lang == 'en') {
+            return response()->json(['message' => 'User list retrieved successfully.', 'users' => $users]);
+        } else if ($lang == 'hu') {
+            return response()->json(['message' => 'Felhasználók listája sikeresen lekérve.', 'users' => $users]);
+        } else if ($lang == 'zh') {
+            return response()->json(['message' => '用户列表获取成功', 'users' => $users]);
+        }
+    }
+
+    public function getUserByEmail($email)
+    {
+        $user = User::where('email', $email)->first();
+
+        if ($user) {
+            return response()->json(['message' => 'User found.', 'user' => $user]);
+        } 
+        else {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+    }
+
 
 
 
