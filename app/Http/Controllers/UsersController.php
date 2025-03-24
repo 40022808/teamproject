@@ -23,22 +23,27 @@ class UsersController extends Controller
             'role' => 0
         ]);
 
-        if(User::count() == 1) {
+        if (User::count() == 1) {
             $user->role = 2;
             $user->save();
         }
 
 
-        if($lang == 'en') {
+        if ($lang == 'en') {
             return response()->json(['message' => 'User registered successfully.'], 201);
-        }else if ($lang == 'hu') {
+        } else if ($lang == 'hu') {
             return response()->json(['message' => 'A felhaszmáló sikeresen regisztrálva.'], 201);
-        }else if ($lang == 'zh') {
-            return response()->json(['message' => '用户注册成功'],201);
+        } else if ($lang == 'zh') {
+            return response()->json(['message' => '用户注册成功'], 201);
         }
-        
+
     }
 
+    public function getUserRole(Request $request)
+    {
+        $role = $request->user()->role->name; // Adjust based on your database structure
+        return response()->json(['role' => $role]);
+    }
     public function login(Request $request, $lang)
     {
         $credentials = $request->only('email', 'password');
@@ -48,12 +53,12 @@ class UsersController extends Controller
             return response()->json(['token' => $token]);
         }
 
-        
-        if($lang == 'en') {
+
+        if ($lang == 'en') {
             return response()->json(['error' => 'Unauthorized'], 401);
-        }else if ($lang == 'hu') {
+        } else if ($lang == 'hu') {
             return response()->json(['error' => 'Nem engedélyezett'], 401);
-        }else if ($lang == 'zh') {
+        } else if ($lang == 'zh') {
             return response()->json(['error' => '登录失败'], 401);
         }
     }
@@ -61,13 +66,13 @@ class UsersController extends Controller
     public function logout($lang)
     {
         Auth::logout();
-        
 
-        if($lang == 'en') {
+
+        if ($lang == 'en') {
             return response()->json(['message' => 'Logged out successfully.']);
-        }else if ($lang == 'hu') {
+        } else if ($lang == 'hu') {
             return response()->json(['message' => 'Sikeresen kkijelentkezett.']);
-        }else if ($lang == 'zh') {
+        } else if ($lang == 'zh') {
             return response()->json(['message' => '登出成功.']);
         }
     }
@@ -144,7 +149,7 @@ class UsersController extends Controller
         $user->name = $validatedData['name'];
         $user->save();
 
-        if($lang == 'en') {
+        if ($lang == 'en') {
             return response()->json(['message' => 'User name updated successfully.']);
         } else if ($lang == 'hu') {
             return response()->json(['message' => 'A felhasználó neve sikeresen frissítve.']);
@@ -154,30 +159,32 @@ class UsersController extends Controller
     }
 
 
-    public function checkOldPassword(Request $request) {
+    public function checkOldPassword(Request $request)
+    {
         $user = Auth::user();
         $validatedData = $request->validate([
             'old_password' => 'required|string|min:6',
         ]);
-        
+
         if (password_verify($validatedData['old_password'], $user->password)) {
             return response()->json(['message' => 'Old password is correct.']);
         } else {
             return response()->json(['error' => 'Old password is incorrect.'], 400);
         }
     }
-    
-    public function updatePassword(Request $request, $lang) {
+
+    public function updatePassword(Request $request, $lang)
+    {
         $user = Auth::user();
         $validatedData = $request->validate([
             'new_password' => 'required|string|min:6|confirmed|max:10',
-            
+
         ]);
-    
-        
+
+
         $user->password = bcrypt($validatedData['new_password']);
         $user->save();
-        
+
         if ($lang == 'en') {
             return response()->json(['message' => 'Password updated successfully.']);
         } else if ($lang == 'hu') {
@@ -186,11 +193,11 @@ class UsersController extends Controller
             return response()->json(['message' => '密码更新成功'], 200);
         }
     }
-    
+
 
     public function getUserList($lang)
     {
-        $users = User::all(); 
+        $users = User::all();
 
         if ($lang == 'en') {
             return response()->json(['message' => 'User list retrieved successfully.', 'users' => $users]);
@@ -207,14 +214,10 @@ class UsersController extends Controller
 
         if ($user) {
             return response()->json(['message' => 'User found.', 'user' => $user]);
-        } 
-        else {
+        } else {
             return response()->json(['error' => 'User not found.'], 404);
         }
     }
-
-
-
 
 }
 
