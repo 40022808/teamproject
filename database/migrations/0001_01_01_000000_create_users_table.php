@@ -46,4 +46,5 @@ return new class extends Migration
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
+    // Removed invalid Mail statement as it does not belong in a migration class.
 };

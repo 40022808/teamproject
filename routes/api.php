@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductController;
-
+use App\Http\Controllers\Auth\RegisterController;
 Route::group(['prefix' => '{lang}'], function () {
     Route::post('register', [UsersController::class, 'register']);
     Route::post('login', [UsersController::class, 'login']);
@@ -40,3 +40,5 @@ Route::get('products/{id}', [ProductController::class, 'show']);
 Route::post('/products', [ProductController::class, 'store']);
 Route::put('products/{id}', [ProductController::class, 'update']);
 Route::delete('products/{id}', [ProductController::class, 'destroy']);
+
+Route::post('/registers', [RegisterController::class, 'register']);

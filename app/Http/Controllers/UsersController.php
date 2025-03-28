@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RegistrationSuccessful;
 
 class UsersController extends Controller
 {
@@ -28,7 +30,8 @@ class UsersController extends Controller
             $user->save();
         }
 
-
+        
+        Mail::to($user->email)->queue(new RegistrationSuccessful($user));
         if ($lang == 'en') {
             return response()->json(['message' => 'User registered successfully.'], 201);
         } else if ($lang == 'hu') {
@@ -218,6 +221,7 @@ class UsersController extends Controller
             return response()->json(['error' => 'User not found.'], 404);
         }
     }
+        
+    }
 
-}
 
