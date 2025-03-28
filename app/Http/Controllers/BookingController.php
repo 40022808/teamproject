@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Booking;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingConfirmationMail;
 
 class BookingController extends Controller
 {
@@ -20,12 +22,13 @@ class BookingController extends Controller
 
 public function storeBooking(Request $request)
 {
-    \Log::info('Request data:', $request->all()); 
     $validated = $request->validate([
         'date' => 'required|date',
         'time' => 'required|date_format:H:i',
         'gender' => 'required|string',
+        'email' => 'required|email',
     ]);
+
     $alreadyBooked = Booking::where('date', $validated['date'])
                             ->where('time', $validated['time'])
                             ->exists();
@@ -34,12 +37,14 @@ public function storeBooking(Request $request)
         return response()->json(['success' => false, 'message' => 'This time slot is already booked.'], 400);
     }
 
-    // Ha nem foglalt, mentjük a foglalást
     $booking = new Booking();
     $booking->date = $validated['date'];
     $booking->time = $validated['time'];
     $booking->gender = $validated['gender'];
     $booking->save();
+
+    // E-mail küldése
+    Mail::to($validated['email'])->queue(new BookingConfirmationMail($validated));
 
     return response()->json(['success' => true, 'booking' => $booking]);
 }
