@@ -20,12 +20,21 @@ class BookingController extends Controller
 
 public function storeBooking(Request $request)
 {
+    \Log::info('Request data:', $request->all()); 
     $validated = $request->validate([
         'date' => 'required|date',
         'time' => 'required|date_format:H:i',
         'gender' => 'required|string',
     ]);
+    $alreadyBooked = Booking::where('date', $validated['date'])
+                            ->where('time', $validated['time'])
+                            ->exists();
 
+    if ($alreadyBooked) {
+        return response()->json(['success' => false, 'message' => 'This time slot is already booked.'], 400);
+    }
+
+    // Ha nem foglalt, mentjük a foglalást
     $booking = new Booking();
     $booking->date = $validated['date'];
     $booking->time = $validated['time'];
@@ -34,6 +43,7 @@ public function storeBooking(Request $request)
 
     return response()->json(['success' => true, 'booking' => $booking]);
 }
+
 
 public function getBookedDates()
 {
