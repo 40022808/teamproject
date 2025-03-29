@@ -5,27 +5,28 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
+
 class ProductController extends Controller
 {
     public function store(Request $request)
-{
-    $request->validate([
-        "name" => "required|string|max:255",
-        "price" => "required|numeric",
-        "image" => "nullable|file|mimes:jpg,jpeg,png|max:2048"
-    ]);
+    {
+        $request->validate([
+            "name" => "required|string|max:255",
+            "price" => "required|numeric",
+            "image" => "nullable|file|mimes:jpg,jpeg,png|max:2048"
+        ]);
 
-    $data = $request->all();
+        $data = $request->all();
 
-    // Kép mentése
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('images', 'public');
-        $data['imageURL'] = Storage::url($path); // Helyes URL generálása
+        // Kép mentése
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('images', 'public');
+            $data['imageURL'] = Storage::url($path); // Helyes URL generálása
+        }
+
+        $product = Product::create($data);
+        return response()->json($product, 201);
     }
-
-    $product = Product::create($data);
-    return response()->json($product, 201);
-}
     public function index()
     {
         return response()->json(Product::all(), 200);
@@ -34,23 +35,33 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $product->update($request->all());
-        return response()->json($product, 200);
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ]);
+
+        $product->update($validatedData);
+
+        return response()->json(['message' => 'Product updated successfully', 'product' => $product]);
     }
 
     public function destroy($id)
     {
-        Product::destroy($id);
-        return response()->json(null, 204);
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json(['message' => 'Product deleted successfully']);
     }
     public function show($id)
-{
-    $product = Product::find($id);
+    {
+        $product = Product::find($id);
 
-    if (!$product) {
-        return response()->json(['error' => 'Product not found'], 404);
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        return response()->json($product, 200);
     }
-
-    return response()->json($product, 200);
-}
 }
