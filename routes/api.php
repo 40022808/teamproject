@@ -7,6 +7,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CartController; // Ensure this controller exists in the specified namespace
 
 
 Route::group(['prefix' => '{lang}'], function () {
@@ -45,3 +46,9 @@ Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 Route::put('products/{id}', [ProductController::class, 'update']);
 Route::post('/delivery', [DeliveryController::class, 'storeDelivery']);
 Route::get('/user-bookings', [BookingController::class, 'getUserBookings']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    Route::delete('/cart/{id}', [CartController::class, 'destroy']);
+});
