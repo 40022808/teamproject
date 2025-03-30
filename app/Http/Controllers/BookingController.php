@@ -43,6 +43,7 @@ public function storeBooking(Request $request)
     $booking->date = $validated['date'];
     $booking->time = $validated['time'];
     $booking->gender = $validated['gender'];
+    $booking->email = $validated['email'];
     $booking->save();
 
     Mail::to($validated['email'])->queue(new BookingConfirmationMail($validated));
@@ -69,4 +70,20 @@ public function getUserBookings(Request $request)
 
     return response()->json(['success' => true, 'bookings' => $bookings]);
 }
+public function getBookings(Request $request)
+{
+    $userRole = $request->query('role'); // A frontend küldi a szerepkört
+    $userEmail = $request->query('email'); // A frontend küldi az email címet
+
+    if ($userRole === '2') { // Szuperadmin
+        $bookings = Booking::all(); // Minden foglalás
+    } elseif ($userRole === '1') { // Admin
+        $bookings = Booking::all(); // Admin is láthat minden foglalást
+    } else { // Felhasználó
+        $bookings = Booking::where('email', $userEmail)->get(); // Csak a saját foglalások
+    }
+
+    return response()->json(['success' => true, 'bookings' => $bookings]);
+}
+
 }
