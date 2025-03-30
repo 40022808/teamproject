@@ -45,3 +45,6 @@ Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 Route::put('products/{id}', [ProductController::class, 'update']);
 Route::post('/delivery', [DeliveryController::class, 'storeDelivery']);
 Route::get('/user-bookings', [BookingController::class, 'getUserBookings']);
+Route::get('/bookings', [BookingController::class, 'getBookings']);
+Route::get('/all-bookings', [BookingController::class, 'getAllBookings']);
+Route::middleware('auth:api')->get('/all-bookings', [BookingController::class, 'getAllBookings']);

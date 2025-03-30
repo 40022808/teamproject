@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::table('bookings', function (Blueprint $table) {
-        $table->time('timee')->after('date'); // Idő oszlop hozzáadása
-    });
-}
+//     Schema::table('bookings', function (Blueprint $table) {
+//         $table->time('time')->after('date'); // Idő oszlop hozzáadása
+//     });
+ }
 
 public function down()
 {

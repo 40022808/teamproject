@@ -75,15 +75,26 @@ public function getBookings(Request $request)
     $userRole = $request->query('role'); // A frontend küldi a szerepkört
     $userEmail = $request->query('email'); // A frontend küldi az email címet
 
-    if ($userRole === '2') { // Szuperadmin
-        $bookings = Booking::all(); // Minden foglalás
-    } elseif ($userRole === '1') { // Admin
-        $bookings = Booking::all(); // Admin is láthat minden foglalást
+    if ($userRole === '2') { 
+        $bookings = Booking::all(); 
+    } elseif ($userRole === '1') { 
+        $bookings = Booking::all(); 
     } else { // Felhasználó
-        $bookings = Booking::where('email', $userEmail)->get(); // Csak a saját foglalások
+        $bookings = Booking::where('email', $userEmail)->get(); 
     }
 
     return response()->json(['success' => true, 'bookings' => $bookings]);
+}
+public function getAllBookings(Request $request)
+{
+    $userRole = $request->query('role', null); // A frontend küldi a szerepkört
+
+    if ($userRole === '2' || $userRole === '1') { // Csak admin és szuperadmin
+        $bookings = Booking::all(); // Minden foglalás
+        return response()->json(['success' => true, 'bookings' => $bookings]);
+    } else {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
 }
 
 }
