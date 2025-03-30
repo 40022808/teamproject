@@ -8,6 +8,7 @@ use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Auth\RegisterController;
 
+
 Route::group(['prefix' => '{lang}'], function () {
     Route::post('register', [UsersController::class, 'register']);
     Route::post('login', [UsersController::class, 'login']);
@@ -42,3 +43,5 @@ Route::get('products/{id}', [ProductController::class, 'show']);
 Route::post('/products', [ProductController::class, 'store']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 Route::put('products/{id}', [ProductController::class, 'update']);
+Route::post('/delivery', [DeliveryController::class, 'storeDelivery']);
+Route::get('/user-bookings', [BookingController::class, 'getUserBookings']);
