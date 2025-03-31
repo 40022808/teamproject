@@ -42,6 +42,7 @@ class ProductController extends Controller
         $validatedData = $request->validate([
             "name" => "required|string|max:255",
             "price" => "required|numeric",
+            "description" => "nullable|string",
             "image" => "nullable|file|mimes:jpg,jpeg,png|max:2048"
         ]);
 
