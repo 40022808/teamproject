@@ -1,5 +1,5 @@
 <?php
-
+// filepath: app/Http/Controllers/CartController.php
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
@@ -14,7 +14,7 @@ class CartController extends Controller
             ->with('product') // Load product details
             ->get();
 
-        return response()->json($cartItems);
+        return response()->json(['success' => true, 'cartItems' => $cartItems]);
     }
 
     public function store(Request $request)
@@ -32,7 +32,7 @@ class CartController extends Controller
             ['quantity' => $validated['quantity']]
         );
 
-        return response()->json($cartItem, 201);
+        return response()->json(['success' => true, 'cartItem' => $cartItem], 201);
     }
 
     public function destroy($id, Request $request)
@@ -43,6 +43,6 @@ class CartController extends Controller
 
         $cartItem->delete();
 
-        return response()->json(['message' => 'Item removed from cart'], 200);
+        return response()->json(['success' => true, 'message' => 'Item removed from cart'], 200);
     }
 }

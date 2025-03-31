@@ -9,17 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    
+public function up()
 {
-//     Schema::table('bookings', function (Blueprint $table) {
-//         $table->time('time')->after('date'); // Idő oszlop hozzáadása
-//     });
- }
+    Schema::table('bookings', function (Blueprint $table) {
+        $table->string('email')->after('gender'); // Az 'email' oszlop hozzáadása
+    });
+}
 
 public function down()
 {
     Schema::table('bookings', function (Blueprint $table) {
-        $table->dropColumn('time');
+        $table->dropColumn('email'); // Az 'email' oszlop eltávolítása
     });
 }
 };
