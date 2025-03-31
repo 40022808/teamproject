@@ -30,7 +30,7 @@ class UsersController extends Controller
             $user->save();
         }
 
-        
+
         Mail::to($user->email)->queue(new RegistrationSuccessful($user));
         if ($lang == 'en') {
             return response()->json(['message' => 'User registered successfully.'], 201);
@@ -39,14 +39,13 @@ class UsersController extends Controller
         } else if ($lang == 'zh') {
             return response()->json(['message' => '用户注册成功'], 201);
         }
-
     }
 
     public function getUserRole(Request $request)
     {
-        $role = $request->user()->role->name; // Adjust based on your database structure
-        return response()->json(['role' => $role]);
+        return response()->json(['role' => $request->user()->role]);
     }
+
     public function login(Request $request, $lang)
     {
         $credentials = $request->only('email', 'password');
@@ -221,7 +220,4 @@ class UsersController extends Controller
             return response()->json(['error' => 'User not found.'], 404);
         }
     }
-        
-    }
-
-
+}
