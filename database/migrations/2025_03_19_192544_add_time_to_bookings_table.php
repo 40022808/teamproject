@@ -12,7 +12,7 @@ return new class extends Migration
     public function up()
 {
     Schema::table('bookings', function (Blueprint $table) {
-        $table->time('timee')->after('date'); // Idő oszlop hozzáadása
+        /* $table->time('timee')->after('date'); // Idő oszlop hozzáadása */
     });
 }
 

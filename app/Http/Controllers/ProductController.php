@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
+
 
 class ProductController extends Controller
 {
@@ -37,14 +40,17 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'description' => 'nullable|string',
+            "name" => "required|string|max:255",
+            "price" => "required|numeric",
+            "image" => "nullable|file|mimes:jpg,jpeg,png|max:2048"
         ]);
 
         $product->update($validatedData);
 
-        return response()->json(['message' => 'Product updated successfully', 'product' => $product]);
+        return response()->json([
+            'message' => 'Product updated successfully',
+            'product' => $product,
+        ]);
     }
 
     public function destroy($id)
