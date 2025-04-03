@@ -91,6 +91,73 @@ public function getAllBookings(Request $request)
 
     return response()->json(['success' => true, 'bookings' => $bookings]);
 }
+
+public function updateBooking(Request $request, $id)
+{
+    // 1. Validáció
+    $validated = $request->validate([
+        'date' => 'sometimes|date',
+        'time' => 'sometimes|date_format:H:i',
+        'gender' => 'sometimes|string',
+    ]);
+
+    // 2. Foglalás keresése
+    $booking = Booking::find($id);
+
+    if (!$booking) {
+        return response()->json(['success' => false, 'message' => 'Booking not found.'], 404);
+    }
+
+    // 3. Felhasználói adatok lekérése
+    $userRole = $request->query('role');
+    $userEmail = $request->query('email');
+
+    // 4. Jogosultság ellenőrzése
+    if ($booking->email !== $userEmail && $userRole !== '2' && $userRole !== '1') {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    // 5. Foglalás frissítése (csak a megadott mezők)
+    if ($request->has('date')) {
+        $booking->date = $validated['date'];
+    }
+
+    if ($request->has('time')) {
+        $booking->time = $validated['time'];
+    }
+
+    if ($request->has('gender')) {
+        $booking->gender = $validated['gender'];
+    }
+
+    $booking->save();
+
+    // 6. Sikeres válasz
+    return response()->json(['success' => true, 'booking' => $booking]);
+}
+public function deleteBooking(Request $request, $id)
+{
+    $user = $request->user(); // Check if the user is authenticated
+
+    if (!$user) {
+        return response()->json(['success' => false, 'message' => 'User not authenticated.'], 401);
+    }
+
+    $booking = Booking::find($id);
+
+    if (!$booking) {
+        return response()->json(['success' => false, 'message' => 'Booking not found.'], 404);
+    }
+
+    // Check permissions
+    if ($user->role !== 1 && $user->role !== 2 && $booking->user_id !== $user->id) {
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+    }
+
+    $booking->delete();
+
+    return response()->json(['success' => true, 'message' => 'Booking deleted successfully.']);
+}
 }
 
 

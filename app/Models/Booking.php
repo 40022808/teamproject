@@ -10,6 +10,6 @@ use Illuminate\Http\Request;
 class Booking extends Model
 {
     use HasFactory;
-
+    protected $table = 'bookings';
     protected $fillable = ['date', 'time', 'gender', 'email'];
 }

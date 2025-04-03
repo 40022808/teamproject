@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Delivery Confirmation</title>
+    <title>Szállítási Visszaigazolás</title>
 </head>
 <body>
-    <h1>Delivery Confirmation</h1>
-    <p>Dear {{ $deliveryData['fullName'] }},</p>
-    <p>Thank you for providing your delivery details. Here are the details:</p>
+    <h1>Szállítási Visszaigazolás</h1>
+    <p>Kedves {{ $deliveryData['fullName'] }}!</p>
+    <p>Köszönjük, hogy megadta szállítási adatait. Az alábbiakban találja a részleteket:</p>
     <ul>
-        <li><strong>Full Name:</strong> {{ $deliveryData['fullName'] }}</li>
-        <li><strong>Address:</strong> {{ $deliveryData['address'] }}</li>
-        <li><strong>House Number:</strong> {{ $deliveryData['houseNumber'] }}</li>
-        <li><strong>City:</strong> {{ $deliveryData['city'] }}</li>
-        <li><strong>Postal Code:</strong> {{ $deliveryData['postalCode'] }}</li>
-        <li><strong>Phone Number:</strong> {{ $deliveryData['phone'] }}</li>
+        <li><strong>Teljes név:</strong> {{ $deliveryData['fullName'] }}</li>
+        <li><strong>Cím:</strong> {{ $deliveryData['address'] }}</li>
+        <li><strong>Házszám:</strong> {{ $deliveryData['houseNumber'] }}</li>
+        <li><strong>Város:</strong> {{ $deliveryData['city'] }}</li>
+        <li><strong>Irányítószám:</strong> {{ $deliveryData['postalCode'] }}</li>
+        <li><strong>Telefonszám:</strong> {{ $deliveryData['phone'] }}</li>
     </ul>
-    <p>We will process your delivery shortly.</p>
+    <p>Rendelését készpénzzel vagy bankkártyával tudja kifizetni a szállítás időpontjában.</p>
+    <p>Köszönjük rendelését!</p>
+    <p>Üdvözlettel,</p>
+    <p>Barber Shop Csapat :3</p>
+    <p>Megjegyzés: Ez egy automatikus üzenet. Kérjük, ne válaszoljon erre az e-mailre.</p>
 </body>
 </html>

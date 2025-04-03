@@ -50,6 +50,9 @@ Route::post('/delivery', [DeliveryController::class, 'storeDelivery']);
 Route::get('/user-bookings', [BookingController::class, 'getUserBookings']);
 Route::get('/bookings', [BookingController::class, 'getBookings']);
 Route::get('/all-bookings', [BookingController::class, 'getAllBookings']);
+Route::get('/bookings/{id}', [BookingController::class, 'getBookingById']);
+Route::middleware('auth:sanctum')->delete('/bookings/{id}', [BookingController::class, 'deleteBooking']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cart', [CartController::class, 'index']);
@@ -57,4 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cartdelete/{id}', [CartController::class, 'destroy']);
     Route::post('/cart/decrease/{productId}', [CartController::class, 'decreaseQuantity']);
+    Route::middleware('auth:sanctum')->put('/bookings/{id}', [BookingController::class, 'updateBooking'])->name('bookings.update');
+    
+
 });
