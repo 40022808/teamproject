@@ -20,97 +20,97 @@ use App\Models\Users; // Users modell importálása
 class CartController extends Controller
 {
     public function index(Request $request)
-{
-    $userId = $request->user()->id; // Bejelentkezett felhasználó ID-ja
+    {
+        $userId = $request->user()->id; // Bejelentkezett felhasználó ID-ja
 
-    $cartItems = Cart::where('user_id', $userId)
-        ->with('product') // Termék részletek betöltése
-        ->get();
+        $cartItems = Cart::where('user_id', $userId)
+            ->with('product') // Termék részletek betöltése
+            ->get();
 
-    return response()->json(['success' => true, 'cartItems' => $cartItems]);
-}
+        return response()->json(['success' => true, 'cartItems' => $cartItems]);
+    }
 
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'product_id' => 'required|exists:products,id',
-        'quantity' => 'required|integer|min:1',
-    ]);
-
-    $cartItem = Cart::where('user_id', $request->user()->id)
-        ->where('product_id', $validated['product_id'])
-        ->first();
-
-    if ($cartItem) {
-        // Ha a termék már létezik a kosárban, növeljük a mennyiséget
-        $cartItem->quantity += $validated['quantity'];
-        $cartItem->save();
-    } else {
-        // Ha a termék nem létezik, hozzuk létre
-        $cartItem = Cart::create([
-            'user_id' => $request->user()->id,
-            'product_id' => $validated['product_id'],
-            'quantity' => $validated['quantity'],
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
         ]);
+
+        $cartItem = Cart::where('user_id', $request->user()->id)
+            ->where('product_id', $validated['product_id'])
+            ->first();
+
+        if ($cartItem) {
+            // Ha a termék már létezik a kosárban, növeljük a mennyiséget
+            $cartItem->quantity += $validated['quantity'];
+            $cartItem->save();
+        } else {
+            // Ha a termék nem létezik, hozzuk létre
+            $cartItem = Cart::create([
+                'user_id' => $request->user()->id,
+                'product_id' => $validated['product_id'],
+                'quantity' => $validated['quantity'],
+            ]);
+        }
+
+        return response()->json(['success' => true, 'cartItem' => $cartItem], 201);
+    }
+    public function update(Request $request, $id)
+    {
+        $cartItem = Cart::find($id);
+
+        if (!$cartItem) {
+            return response()->json(['success' => false, 'message' => 'Item not found'], 404);
+        }
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $cartItem->update($validated);
+
+        $cartItem->load('product'); // Termék részletek betöltése
+
+        return response()->json(['success' => true, 'cartItem' => $cartItem]);
     }
 
-    return response()->json(['success' => true, 'cartItem' => $cartItem], 201);
-}
-public function update(Request $request, $id)
-{
-    $cartItem = Cart::find($id);
 
-    if (!$cartItem) {
-        return response()->json(['success' => false, 'message' => 'Item not found'], 404);
+    public function destroy($id)
+    {
+        $userId = Auth::id(); // Bejelentkezett felhasználó ID-ja
+        $cartItem = Cart::where('product_id', $id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if (!$cartItem) {
+            return response()->json(['success' => false, 'message' => 'Item not found'], 404);
+        }
+
+        $cartItem->delete();
+
+        return response()->json(['success' => true, 'message' => 'Item removed from cart']);
     }
 
-    $validated = $request->validate([
-        'quantity' => 'required|integer|min:1',
-    ]);
+    public function decreaseQuantity(Request $request, $productId)
+    {
+        $userId = $request->user()->id; // Bejelentkezett felhasználó ID-ja
 
-    $cartItem->update($validated);
+        $cartItem = Cart::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->first();
 
-    $cartItem->load('product'); // Termék részletek betöltése
+        if (!$cartItem) {
+            return response()->json(['success' => false, 'message' => 'Item not found in cart'], 404);
+        }
 
-    return response()->json(['success' => true, 'cartItem' => $cartItem]);
-}
-   
-    
-public function destroy($id)
-{
-    $userId = Auth::id(); // Bejelentkezett felhasználó ID-ja
-    $cartItem = Cart::where('product_id', $id)
-        ->where('user_id', $userId)
-        ->first();
+        if ($cartItem->quantity > 1) {
+            $cartItem->quantity -= 1;
+            $cartItem->save();
+        } else {
+            $cartItem->delete(); // Ha a darabszám 1, töröljük a terméket
+        }
 
-    if (!$cartItem) {
-        return response()->json(['success' => false, 'message' => 'Item not found'], 404);
+        return response()->json(['success' => true, 'message' => 'Quantity decreased successfully']);
     }
-
-    $cartItem->delete();
-
-    return response()->json(['success' => true, 'message' => 'Item removed from cart']);
-}
-
-public function decreaseQuantity(Request $request, $productId)
-{
-    $userId = $request->user()->id; // Bejelentkezett felhasználó ID-ja
-
-    $cartItem = Cart::where('user_id', $userId)
-        ->where('product_id', $productId)
-        ->first();
-
-    if (!$cartItem) {
-        return response()->json(['success' => false, 'message' => 'Item not found in cart'], 404);
-    }
-
-    if ($cartItem->quantity > 1) {
-        $cartItem->quantity -= 1;
-        $cartItem->save();
-    } else {
-        $cartItem->delete(); // Ha a darabszám 1, töröljük a terméket
-    }
-
-    return response()->json(['success' => true, 'message' => 'Quantity decreased successfully']);
-}
 }
